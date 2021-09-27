@@ -15,7 +15,7 @@ const ErrorComponent = {
     return `<div class="card">
     <div class="headerfield">
     <div>-</div>
-    <a href="index.html"><button class="close">🤞</button></a>
+    <a href="index.html"><button class="close">✖</button></a>
     </div>
     <p> Error: 404 page not found</p></div>
     `;
@@ -31,7 +31,7 @@ const ShareComponent = {
     // let copycode = `<svg class="copycode" code="${code}" onClick="copyCode(this)" viewBox="0 0 24 24" fill="none" stroke="#DEFEFC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-copy"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
     return `<div class="card">
     <div class="headerfield">
-    <h3>CODE: ${code} <i class="bi bi-clipboard code="${code} onClick="copyCode(this)"></i></h3>
+    <h3>CODE: ${code} <i class="bi bi-clipboard" code=${code} onClick="copyCode(this)"></i></h3>
     <div>
     <button class="minimize" onClick="minimize()"><i class="bi bi-arrows-angle-contract"></i></button>
     <a href="index.html"><button class="close" >✖</button></a>
@@ -46,15 +46,19 @@ function update(position) {
     lat: position.coords.latitude,
     lng: position.coords.longitude,
   });
-  marker.setPosition(
-    new google.maps.LatLng({
-      lat: position.coords.latitude,
-      lng: position.coords.longitude,
-    })
-  );
+  userMarker.setPosition({
+    lat: position.coords.latitude,
+    lng: position.coords.longitude,
+  });
+  // marker.setPosition(
+  //   new google.maps.LatLng({
+  //     lat: position.coords.latitude,
+  //     lng: position.coords.longitude,
+  //   })
+  // );
   socket.emit("coordinates", {
     coords: { lat: position.coords.latitude, lng: position.coords.longitude },
-    code: document.querySelector(".copycode").getAttribute("code"),
+    code: document.querySelector(".bi-clipboard").getAttribute("code"),
   });
 }
 function error() {
@@ -74,21 +78,41 @@ function copyCode(e) {
 }
 const TrackComponent = {
   render: () => {
-    let bounds = new google.maps.LatLngBounds();
-    socket.on("lolipop", (coords) => {
-      console.log(coords);
-      marker.setPosition(new google.maps.LatLng(coords));
-      // map.setCenter(coords);
+    // let coordinates = {};
+
+    const watchCoodinates = navigator.geolocation.watchPosition((p) => {
+      // console.table({ lat: p.coords.latitude, lng: p.coords.longitude });
+      // coordinates["tracker"] = {
+      //   lat: p.coords.latitude,
+      //   lng: p.coords.longitude,
+      // };
+
+      userMarker.setPosition({
+        lat: p.coords.latitude,
+        lng: p.coords.longitude,
+      });
+      bounds.extend({
+        lat: p.coords.latitude,
+        lng: p.coords.longitude,
+      });
+
+      // marker.setPosition(
+      //   new google.maps.LatLng({
+      //     lat: p.coords.latitude,
+      //     lng: p.coords.longitude,
+      //   })
+      // );
     });
-    // const watchCoodinates = navigator.geolocation.watchPosition((p) => {
-    //   console.table({ lat: p.coords.latitude, lng: p.coords.longitude });
-    //   marker.setPosition(
-    //     new google.maps.LatLng({
-    //       lat: p.coords.latitude,
-    //       lng: p.coords.longitude,
-    //     })
-    //   );
-    // });
+    socket.on("lolipop", (coords) => {
+      // console.log(coords);
+      // marker.setPosition(new google.maps.LatLng(coords));
+      // map.setCenter(coords);
+      // coordinates["sharer"] = { lat: coords.lat, lng: coords.lng };
+      sharerMarker.setPosition(coords);
+      bounds.extend(coords);
+      map.fitBounds(bounds);
+    });
+
     return `
     <div class="card">
     <div class="headerfield">

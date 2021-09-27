@@ -102,8 +102,9 @@ body {
   stroke: var(--light-blue);
   position: absolute;
   top: 0;
-  height: 90%;
-  width: 90%;
+  padding: 15px;
+  height: 100%;
+  width: 100%;
   margin: auto;
   z-index: 1;
   /* stroke-width: ; */
@@ -134,7 +135,7 @@ h3 {
   justify-content: space-between;
 }
 .minimize {
-  background-color: rgba(248, 226, 26, 0.781);
+  background-color: rgba(26, 185, 248, 0.781);
   color: var(--light-blue);
   border-style: none;
   padding: 5px;

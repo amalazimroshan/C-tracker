@@ -12,12 +12,12 @@ app.use(express.static(path.join(__dirname, "public")));
 
 io.on("connection", (socket) => {
   socket.on("room code", (room) => {
-    console.log(room);
+    // console.log(room);
     socket.join(room);
     socket.broadcast.to(room).emit("message", ` a user joined on room ${room}`);
   });
   socket.on("coordinates", (data) => {
-    console.log(data);
+    // console.log(data);
     socket.broadcast.to(data.code).emit("lolipop", data.coords);
     //console.log(data);
   });
