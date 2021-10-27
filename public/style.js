@@ -2,7 +2,7 @@ window.addEventListener("hashchange", () => {
   anime({
     targets: ".card",
     duration: 2000,
-    translateY: -20,
+    translateY: -10,
     opacity: 1,
   });
 });

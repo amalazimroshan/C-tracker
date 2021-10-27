@@ -5,7 +5,6 @@ const HomeComponent = {
     return `<div class="button-container">
         <a href="#/share"><button class="button">share</button></a>
         <a href="#/track"><button class="button">track</button></a>
-        <a href="#/more"><button class="button">:</button></a></div>
         `;
   },
 };
@@ -86,16 +85,13 @@ const TrackComponent = {
       //   lat: p.coords.latitude,
       //   lng: p.coords.longitude,
       // };
-
-      userMarker.setPosition({
+      let positon = {
         lat: p.coords.latitude,
         lng: p.coords.longitude,
-      });
-      bounds.extend({
-        lat: p.coords.latitude,
-        lng: p.coords.longitude,
-      });
-
+      };
+      userMarker.setPosition(positon);
+      bounds.extend(positon);
+      center = positon;
       // marker.setPosition(
       //   new google.maps.LatLng({
       //     lat: p.coords.latitude,
@@ -103,15 +99,47 @@ const TrackComponent = {
       //   })
       // );
     });
+    isNotified = false;
     socket.on("lolipop", (coords) => {
       // console.log(coords);
       // marker.setPosition(new google.maps.LatLng(coords));
       // map.setCenter(coords);
       // coordinates["sharer"] = { lat: coords.lat, lng: coords.lng };
+      checkPoint = coords;
       sharerMarker.setPosition(coords);
       bounds.extend(coords);
       map.fitBounds(bounds);
+      if (!isNotified) {
+        if (arePointsNear(checkPoint, center, 5)) {
+          isNotified = true;
+          Notification.requestPermission().then((result) => {
+            if (result === "granted") {
+              Notify();
+            }
+          });
+        }
+      }
+      // else isNotified = false;
     });
+
+    function arePointsNear(checkPoint, centerPoint, km) {
+      var ky = 40000 / 360;
+      var kx = Math.cos((Math.PI * centerPoint.lat) / 180.0) * ky;
+      var dx = Math.abs(centerPoint.lng - checkPoint.lng) * kx;
+      var dy = Math.abs(centerPoint.lat - checkPoint.lat) * ky;
+      return Math.sqrt(dx * dx + dy * dy) <= km;
+    }
+
+    function Notify() {
+      const notifyTitle = "alert!";
+      const notifyBody = "your bus is within 5km";
+      const notifyImg = "https://img.icons8.com/color/96/000000/bus.png";
+      const options = {
+        body: notifyBody,
+        icon: notifyImg,
+      };
+      new Notification(notifyTitle, options);
+    }
 
     return `
     <div class="card">
