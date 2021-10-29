@@ -105,12 +105,12 @@ const TrackComponent = {
       // marker.setPosition(new google.maps.LatLng(coords));
       // map.setCenter(coords);
       // coordinates["sharer"] = { lat: coords.lat, lng: coords.lng };
-      checkPoint = coords;
+
       sharerMarker.setPosition(coords);
       bounds.extend(coords);
       map.fitBounds(bounds);
       if (!isNotified) {
-        if (arePointsNear(checkPoint, center, 5)) {
+        if (arePointsNear(coords, center, 5)) {
           isNotified = true;
           Notification.requestPermission().then((result) => {
             if (result === "granted") {
